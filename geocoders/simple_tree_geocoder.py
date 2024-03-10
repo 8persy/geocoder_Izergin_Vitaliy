@@ -11,6 +11,14 @@ class SimpleTreeGeocoder(Geocoder):
         else:
             self.__data = data
 
+    def _find_area(self, item: TreeNode, area_id: str):
+        if item.id == area_id:
+            return [item]
+        for node in item.areas:
+            tree = self._find_area(node, area_id)
+            if tree:
+                return [item, *tree]
+
     def _apply_geocoding(self, area_id: str) -> str:
         """
             TODO:
@@ -18,4 +26,8 @@ class SimpleTreeGeocoder(Geocoder):
             - В ходе перебора возвращать массив элементов, состоящих из TreeNode необходимой ветки
             - Из массива TreeNode составить полный адрес
         """
-        raise NotImplementedError()
+
+        for item in self.__data:
+            tree = self._find_area(item, area_id)
+            if tree:
+                return ', '.join([i.name for i in tree])
